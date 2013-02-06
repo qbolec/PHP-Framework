@@ -1,0 +1,6 @@
+                AuthType Digest
+                AuthName vanisoft
+
+                AuthDigestProvider file
+                AuthUserFile /etc/vanisoft/.digest
+                Require valid-user

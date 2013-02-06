@@ -1,0 +1,5 @@
+#!/bin/bash
+report=~/public_html/report
+rm -rf $report
+phpunit --stderr --coverage-html $report --include-path ~/typer/app/includes --bootstrap autoload.php -d error_reporting=-1 $@
+cp ~/typer/active/server/tests/php/.htaccess $report
