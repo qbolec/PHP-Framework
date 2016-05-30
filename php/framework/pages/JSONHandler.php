@@ -4,6 +4,7 @@ class JSONHandler extends MethodicHandler
   protected $method_to_interface = array(
     IRequest::METHOD_GET => 'IGetJSONHandler',
     IRequest::METHOD_POST => 'IPostJSONHandler',
+    IRequest::METHOD_PUT => 'IPutJSONHandler',
     IRequest::METHOD_DELETE => 'IDeleteJSONHandler',
   );
   private function must_match(IValidator $validator,IApplicationEnv $env){
@@ -13,7 +14,7 @@ class JSONHandler extends MethodicHandler
       throw new HTTPBadJSONRequestException($error,$env);
     }
   }
-  private function json_from_data($data){
+  protected function json_from_data($data){
     return Framework::get_instance()->get_response_factory()->json_from_data($data);
   }
   private function decode_data($encoded,IApplicationEnv $env){
@@ -60,11 +61,22 @@ class JSONHandler extends MethodicHandler
     return $this->json_from_data($this->get_delete_data($env));
   }
   public function handle_delete(IRequestEnv $env){
-    $encoded = $env->get_request()->get_uri_param('data');
+    $encoded = $env->get_request()->get_delete_value('data');
     $data_env = $this->extend_env($encoded,$env);
     $validator = $this->get_delete_validator($data_env);
     $this->must_match($validator,$data_env);
     return $this->handle_delete_data($data_env);
+  }
+  protected function handle_put_data(IApplicationEnv $env){
+    return $this->json_from_data($this->get_put_data($env));
+  }
+  public function handle_put(IRequestEnv $env){
+    parse_str($env->get_request()->get_body(),$fields);
+    $encoded = Arrays::get($fields,'data');
+    $data_env = $this->extend_env($encoded,$env);
+    $validator = $this->get_put_validator($data_env);
+    $this->must_match($validator,$data_env);
+    return $this->handle_put_data($data_env);
   }
 }
 ?>

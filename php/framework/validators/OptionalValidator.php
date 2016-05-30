@@ -6,11 +6,7 @@ class OptionalValidator extends AbstractValidator implements IValidator
     $this->inner = $inner;
   }
   public function get_error($data){
-    if(null===$data){
-      return null;
-    }else{
-      return $this->inner->get_error($data);
-    }
+    return $this->inner->get_error($data);
   }
 }
 ?>

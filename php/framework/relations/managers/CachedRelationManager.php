@@ -34,25 +34,36 @@ class CachedRelationManager extends RelationManagerWrapper
     return $this->versioning->get_version($key);
   }
   private function get_cached_query_key($function_name,array $args){
-    $key = $args[0];
-    $this->validate_key($key);  
-    $version = $this->get_version($key);
-    return new CacheKey($this->cache,$this->key_prefix . '/' . $version . '/' . $function_name . '?' . $this->encode($args));  
+    return new CacheKey($this->cache,$this->key_prefix . '/' . $function_name . '?' . $this->encode($args));
   }
   private function get_cached_query($function_name,array $args){
+    $key = $args[0];
+    $this->validate_key($key);
+    $expected_version = $this->get_version($key);
     $cached_query_key = $this->get_cached_query_key($function_name,$args);
     try{
-      return $cached_query_key->get();
+      list($version,$result) = $cached_query_key->get();
+      if($version!=$expected_version){
+        throw new IsMissingException($version);
+      }
     }catch(IsMissingException $e){
-      $result=call_user_func_array(array($this,"parent::$function_name"),$args);
-      $cached_query_key->set($result);
+      try{
+        $result=call_user_func_array(array($this,"parent::$function_name"),$args);
+      }catch(IsMissingException $e2){
+        $result = null; //null is not a valid result for get_count, get_all, get_single_column, get_single_row nor get_multiple_rows, so I use it as an indicator of a miss
+      }
+      $cached_query_key->set(array($expected_version,$result));
+    }
+    if(null === $result){
+      throw new IsMissingException(0);
+    }else{
       return $result;
     }
   }
   public function get_count(array $key){
     return $this->get_cached_query(__FUNCTION__,func_get_args());
   }
-  public function get_all(array $key,array $order_by=array(),$limit=null,$offset=null){
+  public function get_all(array $key=array(),array $order_by=array(),$limit=null,$offset=null){
     return $this->get_cached_query(__FUNCTION__,func_get_args());
   }
   public function get_single_column(array $key,$sorting_order=self::DESC,$limit=null,$offset=null){
@@ -75,16 +86,16 @@ class CachedRelationManager extends RelationManagerWrapper
     $cache_keys = array();
     $function_name = 'get_single_row';
     foreach($keys as $i => $key){
-      $version = $versions[$i];
-      $cache_keys[] = $this->key_prefix . '/' . $version . '/' . $function_name . '?' . $this->encode(array($key));
+      $cache_keys[] = $this->key_prefix . '/' . $function_name . '?' . $this->encode(array($key));
     }
     $cached = $this->cache->multi_get($cache_keys);
     $missing_keys = array();
     //zależy mi na tym by kolejność w missing_keys była deterministyczna
     //więc nawet nie będę próbował z jakimiś array_diff_key itp.
     foreach($cache_keys as $idx => $cache_key){
-      if(!array_key_exists($cache_key, $cached)){
+      if(!array_key_exists($cache_key, $cached) || $cached[$cache_key][0]!=$versions[$idx]){
         $missing_keys[] = $keys[$idx];
+        unset($cached[$cache_key]);
       }
     }
     if(!empty($missing_keys)){
@@ -94,11 +105,11 @@ class CachedRelationManager extends RelationManagerWrapper
     $f = 0;
     foreach($cache_keys as $idx => $cache_key){
       if(array_key_exists($cache_key, $cached)){
-        $result[] = $cached[$cache_key];
+        $result[] = $cached[$cache_key][1];
       }else{//jeśli klucz nie istniał w cached, to trafił do missing_keys a potem do found
         $value = $found[$f++];
         if(null!==$value){//jeśli mówią, że go nie ma to nic nie rób, wpp. dodaj do cacheu
-          $this->cache->set($cache_key, $value);
+          $this->cache->set($cache_key, array($versions[$idx],$value));
         }
         //niezależnie czy był hit czy miss, zwróc jakiś wynik
         $result[] = $value;
@@ -111,7 +122,7 @@ class CachedRelationManager extends RelationManagerWrapper
     if($result){//trochę brzydko, bo czasem chodzi o bool (insert) a czasem o int (delete)
       $this->invalidate_cache($key);
     }
-    return $result; 
+    return $result;
   }
   //@TODO: copy&paste z AbstractRelationManager
   protected function validate_data(array $fields_description, array $data){
@@ -119,7 +130,7 @@ class CachedRelationManager extends RelationManagerWrapper
   }
   private function validate_key(array $key){
     $key_description = array_intersect_key($this->get_description(),$key);
-    return $this->validate_data($key_description,$key); 
+    return $this->validate_data($key_description,$key);
   }
   private function invalidate_cache(array $key){
     $this->versioning->invalidate($key);

@@ -9,8 +9,8 @@ class HTTPBadRequestException extends HTTPException
   protected function get_explanation(){
     return $this->explainer->explain($this->getPrevious());
   }
-  protected function get_body(){
-    return parent::get_body() . ':<br>' . Convert::to_html($this->get_explanation());
+  protected function get_body(IRequest $request){
+    return parent::get_body($request) . ':<br>' . Convert::to_html($this->get_explanation());
   }
 }
 ?>

@@ -1,5 +1,5 @@
 <?php
-abstract class AbstractFormHandler extends MethodicHandler implements IPostHandler, IGetHandler
+abstract class AbstractFormHandler extends MethodicHandler implements IPostHandler
 {
   protected function get_post_values(IRequestEnv $env, array $name_to_validator){
     $values = array();

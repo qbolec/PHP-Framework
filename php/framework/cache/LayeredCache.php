@@ -18,7 +18,7 @@ class LayeredCache implements ICache
   }
   public function multi_get(array $key_names){
     $values = $this->near->multi_get($key_names);
-    $misses = array_diff($key_names,array_keys($values));
+    $misses = array_values(array_diff($key_names,array_keys($values)));
     if(0==count($misses)){
       return $values;
     }else{

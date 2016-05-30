@@ -13,6 +13,9 @@ class JSON
     }else{
       //@todo: JSON_UNESCAPED_SLASHES once we get new PHP
       $encoded = json_encode($value);
+      if($encoded===FALSE || json_last_error() !== JSON_ERROR_NONE){
+        throw new CouldNotConvertException('<bad-json>');
+      }
     }
     return $encoded;
   }
@@ -20,7 +23,7 @@ class JSON
     if(null === $data || ''==$data){
       throw new CouldNotConvertException($data);
     }
-    $value = json_decode($data,true); 
+    $value = json_decode($data,true);
     if(null === $value){
       $err = json_last_error();
       if(JSON_ERROR_NONE !== $err){

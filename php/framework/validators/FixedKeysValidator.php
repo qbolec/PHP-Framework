@@ -21,7 +21,9 @@ class FixedKeysValidator extends MapValidator
     if(is_array($data)){
       $missing = array_keys(array_diff_key($this->field_validators,$data));
       foreach($missing as $field_name){
-        $errors[] = new IsMissingException($field_name);
+        if(!($this->field_validators[$field_name] instanceof OptionalValidator)){
+          $errors[] = new IsMissingException($field_name);
+        }
       }
       $unexpected = array_keys(array_diff_key($data,$this->field_validators));
       foreach($unexpected as $field_name){

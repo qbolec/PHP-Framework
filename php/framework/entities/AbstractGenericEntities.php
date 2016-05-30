@@ -13,5 +13,10 @@ abstract class AbstractGenericEntities extends Singleton implements IGenericEnti
     }
     return $entities;
   }
+  public function get_ids(array $entities){
+    return array_map(function($entity){
+      return $entity->get_id();
+    },$entities);
+  }
 }
 ?>

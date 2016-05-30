@@ -9,7 +9,7 @@ class LogClassifier extends Singleton implements ILogClassifier
     $this->path_log_writer = Framework::get_instance()->get_logger()->get_log_writer_factory()->get_path_log_writer();
     $this->classification_validator = new RecordValidator(array(
       'verbosity' => new IntValidator(),
-      'priority' => new OptionalValidator(new IntValidator()),
+      'priority' => new NullableValidator(new IntValidator()),
     ));
   }
   public function classify(array $backtrace,$info){

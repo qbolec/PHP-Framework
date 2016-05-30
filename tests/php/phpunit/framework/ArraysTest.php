@@ -25,7 +25,7 @@ class ArraysTest extends FrameworkTestCase
     $x=Arrays::merge($a,$b);
     $this->assertEquals($ab,$x);
   }
-  
+
   public function testGet(){
     $a = array('a','b');
     $this->assertEquals('a',Arrays::get($a,0));
@@ -230,6 +230,62 @@ class ArraysTest extends FrameworkTestCase
    */
   public function testRange($from,$to,$expected){
     $this->assertSame($expected,Arrays::range($from,$to));
+  }
+  public function getDiffAssocData(){
+    return array(
+      array(array('a'=>'a','0'=>'0',''=>'','null'=>null),array(),array('a'=>'a','0'=>'0',''=>'','null'=>null)),
+      array(array('a'=>'a','0'=>'0',''=>'','null'=>null),array(''=>null),array('a'=>'a','0'=>'0',''=>'','null'=>null)),
+      array(array('a'=>'a','0'=>'0',''=>'','null'=>null),array('0'=>0),array('a'=>'a','0'=>'0',''=>'','null'=>null)),
+      array(array('a'=>'a','0'=>'0',''=>'','null'=>null),array(''=>''),array('a'=>'a','0'=>'0','null'=>null)),
+      array(array('a'=>'a','0'=>'0',''=>'','null'=>null),array('0'=>'0'),array('a'=>'a',''=>'','null'=>null)),
+      array(array('a'=>'a','0'=>'0',''=>'','null'=>null),array('a'=>'b'),array('a'=>'a','0'=>'0',''=>'','null'=>null)),
+      array(array(),array(7),array()),
+      array(array(10,20,30),array(1=>20),array(0=>10,2=>30)),
+    );
+  }
+  /**
+   * @dataProvider getDiffAssocData
+   */
+  public function testDiffAssoc($a,$b,$diff){
+    $this->assertSame($diff,Arrays::diff_assoc($a,$b));
+  }
+  public function getWithoutData(){
+    return array(
+      array( array('a','0','',0,null,false,'a'), 'b', array('a','0','',0,null,false,'a')),
+      array( array('a','0','',0,null,false,'a'), 'a', array('0','',0,null,false)),
+      array( array('a','0','',0,null,false,'a'), '0', array('a','',0,null,false,'a')),
+      array( array('a','0','',0,null,false,'a'), '', array('a','0',0,null,false,'a')),
+      array( array('a','0','',0,null,false,'a'), 0, array('a','0','',null,false,'a')),
+      array( array('a','0','',0,null,false,'a'), null, array('a','0','',0,false,'a')),
+      array( array('a','0','',0,null,false,'a'), false, array('a','0','',0,null,'a')),
+    );
+  }
+  /**
+   * @dataProvider getWithoutData
+   */
+  public function testWithout($a,$e,$rest){
+    $this->assertSame($rest,Arrays::without($a,$e));
+  }
+
+  public function getLastData(){
+    return array(
+      array(array(0,1,2),2),
+      array(array(1=>0,2=>1,3=>2),2),
+      array(array(3=>0,2=>1,1=>2),2),
+      array(array(3=>0,"x"=>1,"aa"=>2),2),
+    );
+  }
+  /**
+   * @dataProvider getLastData
+   */
+  public function testLast($a,$e){
+    $this->assertSame($e,Arrays::last($a));
+  }
+  /**
+   * @expectedException IsMissingException
+   */
+  public function testLastOfEmpty(){
+    Arrays::last(array());
   }
 }
 ?>

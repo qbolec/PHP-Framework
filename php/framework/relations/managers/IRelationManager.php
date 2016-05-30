@@ -3,6 +3,10 @@ interface IRelationManager extends IGetFieldsDescriptor
 {
   const ASC = 0;
   const DESC = 1;
+  const ASC_NULL_LAST = 2;
+  const DESC_NULL_LAST = 3;
+  const ASC_NULL_FIRST = 4;
+  const DESC_NULL_FIRST = 5;
   /**
    * @return int number of entities matching key
    */
@@ -14,7 +18,7 @@ interface IRelationManager extends IGetFieldsDescriptor
    * @param $offset int
    * @return array<map<field_name,value> > ordered and sliced. Only other columns are reported
    */
-  public function get_all(array $key,array $order_by=array(),$limit=null,$offset=null);
+  public function get_all(array $key=array(),array $order_by=array(),$limit=null,$offset=null);
    /**
    * @param $key map<field_name,value> pattern. Must be all but one column.
    * @param $sort_direction ASC/DESC

@@ -61,7 +61,7 @@ abstract class AbstractRelationManager implements IRelationManager
     return $this->prevalidated_get_count($key_description,$key);
   }
   abstract protected function prevalidated_get_count(array $key_description,array $key);
-  public function get_all(array $key,array $order_by=array(),$limit=null,$offset=null){
+  public function get_all(array $key=array(),array $order_by=array(),$limit=null,$offset=null){
     $fields_description = $this->get_fields_description();
     $this->expects_subset_of_keys($fields_description,$key);
     $this->expects_subset_of_keys($fields_description,$order_by);

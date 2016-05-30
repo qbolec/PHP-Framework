@@ -1,6 +1,9 @@
 <?php
 class Logger extends Singleton implements ILogger
 {
+  public function log_exception(Exception $e){
+    $this->log($e->__toString());
+  }
   public function log($info=null){
     $backtrace = debug_backtrace(0);
     $classification = $this->classify($backtrace,$info);

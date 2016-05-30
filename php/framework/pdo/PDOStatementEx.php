@@ -36,6 +36,7 @@ class PDOStatementEx implements IPDOStatement
       PDO::PARAM_STR => 'is_string',
       PDO::PARAM_BOOL => 'is_bool',
       PDO::PARAM_NULL => 'is_null',
+      FloatFieldType::TYPE => 'is_float',
     );
     $check = Arrays::grab($type_to_check,$pdo_data_type);
     if(!($check($value))){
@@ -51,13 +52,14 @@ class PDOStatementEx implements IPDOStatement
       throw new UnexpectedMemberException($parameter_name);
     }
     $this->bound[$parameter_name] = true;
-    $this->statement->bindValue($parameter_name,$value,$pdo_data_type);
+    //PHP PDO does not define PDO::PARAM_FLOAT
+    $this->statement->bindValue($parameter_name,$value,$pdo_data_type===FloatFieldType::TYPE?PDO::PARAM_STR:$pdo_data_type);
   }
   public function bindValues(array $fields_description,array $data){
     foreach($data as $field_name => $value){
       $field_type = $fields_description[$field_name];
       $this->bindValue(':'.$field_name,$value,$field_type->get_pdo_param_type($value));
-    } 
+    }
   }
 }
 ?>

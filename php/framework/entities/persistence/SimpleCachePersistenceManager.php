@@ -18,6 +18,10 @@ class SimpleCachePersistenceManager implements IPersistenceManager
     try{
       return $this->decode_data($encoded_data);
     }catch(IValidationException $e){
+      //jeśli nie usuniemy tej wadliwej wersji klucza,
+      //to layered cache key będzie próbował robić insert
+      //który jest tłumaczony na add() który się nie powiedzie
+      $this->delete_by_id($id);
       throw new NoSuchEntityException($id);
     }
   }
@@ -43,7 +47,7 @@ class SimpleCachePersistenceManager implements IPersistenceManager
   public function get_fields_descriptor(){
     return $this->fields_descriptor;
   }
-  //@todo versioncheck+explode(xFF)+datavalidation 
+  //@todo versioncheck+explode(xFF)+datavalidation
   protected function decode_data($encoded_data){
     //@todo czy na pewno jest sens marnować czas na walidację danych z keszu??
     if(!is_array($encoded_data)){
@@ -73,7 +77,7 @@ class SimpleCachePersistenceManager implements IPersistenceManager
   }
   public function insert(array $data){
     $encoded_data = $this->encode_data($data);
-    return $this->get_cache_key($this->get_id_from_data($data))->add($encoded_data);  
+    return $this->get_cache_key($this->get_id_from_data($data))->add($encoded_data);
   }
   public function save(array $current_data,array $original_data){
     $encoded_data = $this->encode_data($current_data);
@@ -83,7 +87,7 @@ class SimpleCachePersistenceManager implements IPersistenceManager
     if(0<count($unexpected)){
       throw new UnexpectedMemberException(array_pop($unexpected));
     }
-    $changed = array_diff_assoc(array_intersect_key($current_data,$original_data),$original_data);
+    $changed = Arrays::diff_assoc(array_intersect_key($current_data,$original_data),$original_data);
     if(array_key_exists('id',$changed)){
       throw new UnexpectedMemberException('id');
     }
@@ -104,8 +108,10 @@ class SimpleCachePersistenceManager implements IPersistenceManager
         try{
           $result[$id] = $this->decode_data($found_encoded[$cache_key_name]);
         }catch(IValidationException $e){
+          $this->delete_by_id($id);
         }
       }
+
     }
     return $result;
   }

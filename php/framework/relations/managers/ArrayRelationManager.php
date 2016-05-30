@@ -6,6 +6,9 @@ class ArrayRelationManager extends AbstractRelationManager
   private $direction_to_flag = array(
     IRelationManager::DESC => SORT_DESC,
     IRelationManager::ASC => SORT_ASC,
+    //TODO:
+    //IRelationManager::ASC_NULL_LAST
+    //IRelationManager::DESC_NULL_LAST
   );
   public function __construct(IFieldsDescriptor $fields_descriptor,array $data,array $unique_keys){
     parent::__construct($fields_descriptor);
@@ -41,7 +44,11 @@ class ArrayRelationManager extends AbstractRelationManager
         //@see: https://bugs.php.net/bug.php?id=49069&edit=3
         $fresh_var[$i] = $transposed[$column_name];
         $fresh_var[$i+1] = $fields_description[$column_name]->get_sort_type();
-        $fresh_var[$i+2] = Arrays::grab($this->direction_to_flag,$direction);
+        try{
+          $fresh_var[$i+2] = Arrays::grab($this->direction_to_flag,$direction);
+        }catch(IsMissingException $e){
+          throw new LogicException("Sorting in $direction is not supported!");
+        }
     
         $sort_args[]= &$fresh_var[$i];
         $sort_args[]= &$fresh_var[$i+1];

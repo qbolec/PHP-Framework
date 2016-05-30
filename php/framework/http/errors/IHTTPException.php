@@ -1,6 +1,6 @@
 <?php
 interface IHTTPException
 {
-  public function get_response(IResponseFactory $response_factory);
+  public function get_response(IResponseFactory $response_factory,IRequest $request);
 }
 ?>

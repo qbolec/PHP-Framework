@@ -12,7 +12,7 @@ class HTTPBadJSONRequestException extends HTTPBadRequestException
       )
     );
   }
-  protected function get_body(){
+  protected function get_body(IRequest $request){
     return $this->get_explanation();
   }
 }

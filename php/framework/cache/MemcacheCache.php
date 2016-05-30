@@ -29,7 +29,7 @@ class MemcacheCache implements ICache
   }
   private function serialize($value){
     $encoded = JSON::encode($value);
-    $this->halt_unless(JSON::decode($encoded)===$value);
+    $this->halt_unless(JSON::decode($encoded)===$value);//PRICELESS!
     return $encoded;
   }
   private function deserialize($value){
@@ -60,8 +60,8 @@ class MemcacheCache implements ICache
               $res[$key_name] = $this->deserialize($values[$key_name]);
             }else{
               $this->log($key_name);
-            }  
-          } 
+            }
+          }
         }
       }else{
         $this->log();
@@ -112,6 +112,9 @@ class MemcacheCache implements ICache
         return $fallback_value;
       }
     }
+  }
+  public function flush_all(){
+    return $this->client->flush();
   }
 }
 ?>

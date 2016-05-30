@@ -12,6 +12,22 @@ class Arrays{
     return $arr[$key];
   }
   /**
+   * Original array_diff_assoc uses (string)$a[$key] === (string)$b[$key],
+   * we need real strictness.
+   * @param $a map
+   * $parrm $b map
+   * @return map $c with $c[$key] === $a[$key] == $b[$key]
+   */
+  public static function diff_assoc(array $a,array $b){
+    $c = array();
+    foreach($a as $key => $value){
+      if(!array_key_exists($key,$b) || $value !== $b[$key]){
+        $c[$key]=$value;
+      }
+    }
+    return $c;
+  }
+  /**
    * @param $a map
    * @param $b map
    * @return map with keys = keys(a) u keys(b), and conflicting values are taken from $b
@@ -30,8 +46,8 @@ class Arrays{
   /**
    * @param $a array (keys will be lost)
    * @param $b array (keys will be lost)
-   * @return array which values are set-theoretic union of values of $a and $b 
-   */ 
+   * @return array which values are set-theoretic union of values of $a and $b
+   */
   public static function union(array $a,array $b){
     return self::concat($a,array_diff($b,$a));
   }
@@ -59,9 +75,12 @@ class Arrays{
     Framework::get_instance()->get_assertions()->halt_unless(count($keys)==count($values));
     return empty($keys)?array():array_combine($keys,$values);
   }
+  public static function is_subset(array $small,array $big){
+    return 0==count(array_diff($small,$big));
+  }
   /**
    * @param $map map<key,value>
-   * @return array<map<key,value> > 
+   * @return array<map<key,value> >
    */
   public static function all_subsets(array $map){
     $result = array(array());
@@ -72,7 +91,7 @@ class Arrays{
       foreach($with as &$arr){
         $arr[$key]=$value;
       }
-      $result=self::concat($result,$with); 
+      $result=self::concat($result,$with);
     }
     return $result;
   }
@@ -137,6 +156,49 @@ class Arrays{
   //Stdlib range returns nonempty arrays for $to < $from.
   public static function range($from,$to){
     return $to<=$from ? array() : range($from,$to-1,1);
+  }
+
+  public static function pluck(array $arr,$field){
+    return array_map(function($row)use($field){return $row[$field];},$arr);
+  }
+  //uses strict comparison
+  public static function without(array $arr,$element){
+    $c = array();
+    foreach($arr as $value){
+      if($value !== $element){
+        $c[] = $value;
+      }
+    }
+    return $c;
+  }
+  public static function group_by(array $arr,$field){
+    $result = array();
+    foreach($arr as $key=>$value){
+      $result[$value[$field]][$key] = $value;
+    }
+    return $result;
+  }
+  public static function unique_values(array $arr){
+    return array_values(array_unique($arr));
+  }
+  public static function ensure_key_exists(array &$arr,$key,$default_value){
+    if(!array_key_exists($key,$arr)){
+      $arr[$key]=$default_value;
+    }
+  }
+  public static function increment_or_set(array &$arr,$key,$delta=1){
+    if(array_key_exists($key,$arr)){
+      $arr[$key]+=$delta;
+    }else{
+      $arr[$key]=$delta;
+    }
+  }
+  public static function last(array $arr){
+    if(empty($arr)){
+      throw new IsMissingException('last');
+    }
+    list($res)=array_values(array_slice($arr,-1));
+    return $res;
   }
 }
 ?>

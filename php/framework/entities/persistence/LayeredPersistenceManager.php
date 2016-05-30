@@ -37,8 +37,9 @@ class LayeredPersistenceManager implements IPersistenceManager
     }
   }
   public function save(array $current_data,array $original_data){
-    $this->far->save($current_data,$original_data);
+    $res = $this->far->save($current_data,$original_data);
     $this->near->save($current_data,$original_data);
+    return $res;
   }
   public function multi_get_by_ids(array $ids){
     $result = $this->near->multi_get_by_ids($ids);
@@ -51,7 +52,7 @@ class LayeredPersistenceManager implements IPersistenceManager
         $this->near->insert($data);
       }
       return Arrays::set_keys_order(Arrays::merge($result,$more),$ids);
-    }  
+    }
   }
   public function get_fields_descriptor(){
     return $this->far->get_fields_descriptor();

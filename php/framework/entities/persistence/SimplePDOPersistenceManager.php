@@ -110,7 +110,7 @@ class SimplePDOPersistenceManager implements IPersistenceManager
     }
     $fields_description = $this->get_fields_description();
     $this->validate_data($fields_description,$current_data);
-    $changed_data = array_diff_assoc(array_intersect_key($current_data,$original_data),$original_data);
+    $changed_data = Arrays::diff_assoc(array_intersect_key($current_data,$original_data),$original_data);
     if(array_key_exists('id',$changed_data)){
       throw new UnexpectedMemberException('id');
     }

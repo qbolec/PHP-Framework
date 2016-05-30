@@ -55,5 +55,9 @@ class MasterSlaveRedis implements IRedisDB
   public function incr_by($key,$delta){
     return $this->master->incr_by($key,$delta);
   }
+  public function evaluate(ILUAScript $script,array $keys,array $args){
+    return $this->master->evaluate($script,$keys,$args);
+  }
+  
 }
 ?>

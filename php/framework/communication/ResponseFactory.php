@@ -1,8 +1,15 @@
 <?php
 class ResponseFactory extends MultiInstance implements IResponseFactory
 {
-  public function from_http_exception(IHTTPException $e){
-    return $e->get_response($this);
+  public function from_http_exception(IHTTPException $e,IRequest $request){
+    return $e->get_response($this,$request);
+  }
+  public function get_redirect($url){
+    $body = 'found';
+    $headers = array(
+      'Location' => $url,
+    );
+    return $this->from_http_headers_and_body($headers,$body,302,'Found');
   }
   public function from_http_headers_and_body(array $headers,$body,$code=200,$text='OK'){
     return new Response($headers,$body,$code,$text);

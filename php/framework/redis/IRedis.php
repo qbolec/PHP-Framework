@@ -34,5 +34,9 @@ interface IRedis
   //public function multi(MULTI | PIPELINE);
   public function multi();
   public function exec();
+  //eval is a keyword ! 
+  //public function eval($body,$args,$num_keys);
+  //public function eval();
+  public function evaluate($body,$args,$num_keys);  
 }
 ?>

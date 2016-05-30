@@ -8,7 +8,7 @@ class RelationManagerWrapper implements IRelationManager
   public function get_count(array $key){
     return $this->relation_manager->get_count($key);
   }
-  public function get_all(array $key,array $order_by=array(),$limit=null,$offset=null){
+  public function get_all(array $key=array(),array $order_by=array(),$limit=null,$offset=null){
     return $this->relation_manager->get_all($key,$order_by,$limit,$offset);
   }
   public function get_single_column(array $key,$sorting_order=self::DESC,$limit=null,$offset=null){

@@ -9,7 +9,7 @@ class NullableFieldType implements IFieldType
     return new OptionalNormalizer($this->inner->get_normalizer());
   }
   public function get_validator(){
-    return new OptionalValidator($this->inner->get_validator());
+    return new NullableValidator($this->inner->get_validator());
   }
   public function get_pdo_param_type($value){
     return null===$value? 

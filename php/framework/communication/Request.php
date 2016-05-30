@@ -18,6 +18,11 @@ class Request implements IRequest{
   public function get_post_value($name,$default_value=null){
     return Arrays::get($this->post,$name,$default_value); 
   }
+  public function get_delete_value($name,$default_value=null){
+    $arr = array();
+    parse_str($this->body,$arr);
+    return Arrays::get($arr,$name,$default_value);
+  }
   public function get_host(){
     return Arrays::get($this->server,'SERVER_NAME');
   }
@@ -50,6 +55,12 @@ class Request implements IRequest{
   }
   public function get_body(){
     return $this->body;
+  }
+  public function get_client_ips(){
+    $forwarded_for_ips = preg_split('/\\s*,\\s*/', Arrays::get($this->server,'HTTP_X_FORWARDED_FOR',''), -1, PREG_SPLIT_NO_EMPTY);
+    $forwarded_for_ips = array_map('trim',$forwarded_for_ips);
+    $forwarded_for_ips[] = Arrays::get($this->server,'REMOTE_ADDR');
+    return $forwarded_for_ips;
   }
 }
 ?>

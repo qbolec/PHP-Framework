@@ -3,8 +3,7 @@ class ConsistentSelectSharding implements ISelectSharding
 {
   private $ring_bits_count;
   private $assertions;
-  //@todo when we move to 64-bit machine we can remove this sanity check:
-  const MACHINE_BITS = 32;
+  const MACHINE_BITS = 64;
   public function __construct($ring_bits_count,IAssertions $assertions){
     $assertions->halt_unless(8<=$ring_bits_count && $ring_bits_count<self::MACHINE_BITS);//even though we can use MACHINE_BITS-bit integers, half of them are negative, so ring_bits_count must be smaller
     $this->ring_bits_count = $ring_bits_count;

@@ -69,5 +69,9 @@ interface IRedisDB
    * @returns int nowa wartość 
    */
   public function incr_by($key,$delta);
+  /**
+   *
+   */
+  public function evaluate(ILUAScript $script,array $keys,array $args);
 }
 ?>

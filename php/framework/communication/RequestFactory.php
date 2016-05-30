@@ -70,13 +70,15 @@ class RequestFactory extends MultiInstance implements IRequestFactory
       'SCRIPT_URL' => Arrays::get($url_info,'path','/'),
       'REQUEST_URI' => $request_uri,
       'QUERY_STRING' => Arrays::get($url_info,'query',''),
+      'REMOTE_ADDR' => Arrays::get($_SERVER,'REMOTE_ADDR'),
+      'HTTP_X_FORWARDED_FOR' => Arrays::get($_SERVER,'HTTP_X_FORWARDED_FOR'),
     );
     if(Arrays::get($url_info,'scheme')=='https'){
       $server['HTTPS'] = 'on';
     }
     $server['REQUEST_METHOD']=$method;
     parse_str($server['QUERY_STRING'],$get_data);
-    return new Request($post_data,$get_data,$server,array(),'');
+    return new Request($post_data,$get_data,$server,$this->get_headers(),http_build_query($post_data));
   }
 }
 ?>

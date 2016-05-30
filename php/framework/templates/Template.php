@@ -22,5 +22,8 @@ class Template implements ITemplate
   private function out($value){
     echo Strings::to_html($value);
   }
+  private function out_nl2br($value){
+    echo nl2br(Strings::to_html($value));
+  }
 }
 ?>

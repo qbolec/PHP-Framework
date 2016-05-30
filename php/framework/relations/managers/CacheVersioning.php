@@ -111,7 +111,7 @@ class CacheVersioning implements ICacheVersioning
     foreach($keys as $i => $key){
       $all_key_names[$i] = $this->get_keys_names_affecting($key);
     }
-    $unique_keys_names = array_values(array_unique(Arrays::flatten($all_key_names)));
+    $unique_keys_names = Arrays::unique_values(Arrays::flatten($all_key_names));
     $found = $this->versions_storage->multi_get($unique_keys_names);
 
     foreach($all_key_names as $i => $key_names){
@@ -125,9 +125,11 @@ class CacheVersioning implements ICacheVersioning
     return $result;
   }
   public function invalidate(array $key){
+    Framework::get_instance()->get_logger()->log($key);
     $key = $this->get_relevant($key);
     foreach($this->get_keys_names_affected_by($key) as $key_name){
       try{
+        Framework::get_instance()->get_logger()->log($key_name);
         $this->get_cache_key($key_name)->increment(1);
       }catch(IsMissingException $miss){
         //jeśli go nie ma, to gdy sie pojawi będzie na pewno inny niż był kiedykolwiek wcześniej

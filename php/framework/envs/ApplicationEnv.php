@@ -9,7 +9,7 @@ class ApplicationEnv extends RequestEnv implements IApplicationEnv
   }
   public function set($key,$value){
     $type = Arrays::grab($this->get_types(),$key);
-    $this->halt_unless($value instanceof $type);
+    $this->halt_unless(gettype($value)==$type || ($value instanceof $type));
     $this->store[$key] = $value;
   }
   public function grab($key){

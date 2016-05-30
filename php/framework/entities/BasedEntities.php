@@ -1,5 +1,5 @@
 <?php
-abstract class BasedEntities extends Singleton implements IGenericEntities
+abstract class BasedEntities extends AbstractGenericEntities
 {
   abstract protected function get_family_factory();
   public function get_by_id($id){
@@ -22,14 +22,14 @@ abstract class BasedEntities extends Singleton implements IGenericEntities
         $family = $this->get_family_by_id($id);
         $family->get_persistence_manager()->prefetch_by_id($id);
         $families[$id] = $family;
-      }catch(NoSuchEntity $e){
+      }catch(NoSuchEntityException $e){
       }
     }
     $result = array();
     foreach($families as $id => $family){
       try{
         $result[$id] = $family->get_by_id($id);
-      }catch(NoSuchEntity $e){
+      }catch(NoSuchEntityException $e){
       }
     }
     return $result;

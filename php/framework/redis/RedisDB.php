@@ -149,5 +149,16 @@ class RedisDB implements IRedisDB
     $this->halt_unless(is_int($delta));
     return $this->get_redis()->incrBy($key,$delta);
   }
+  public function evaluate(ILUAScript $script,array $keys,array $args){
+    $redis = $this->get_redis();
+    $redis->clearLastError();
+    $ret = $redis->evaluate($script->get_source(),Arrays::concat($keys,$args),count($keys));
+    $err = $redis->getLastError();
+    if($err){
+      $redis->clearLastError();
+      throw new CouldNotConvertException($err);
+    }
+    return $ret;
+  }
 }
 ?>

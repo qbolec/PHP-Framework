@@ -10,6 +10,7 @@ interface IRequest{
   const METHOD_CONNECT = 'CONNECT';
   public function get_uri_param($name,$default_value=null);
   public function get_post_value($name,$default_value=null);
+  public function get_delete_value($name,$default_value=null);
   public function get_host();
   public function get_port();
   public function get_path();
@@ -21,5 +22,6 @@ interface IRequest{
   public function is_https();
   public function get_header($name,$default_value=null);
   public function get_body();
+  public function get_client_ips();
 }
 ?>

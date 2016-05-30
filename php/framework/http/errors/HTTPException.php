@@ -11,11 +11,11 @@ class HTTPException extends Exception implements IHTTPException
       'Cache-Control' => 'no-cache',//zwłaszcza opensocial, jak mu się nie powie wprost, to keszuje nawet błędy
     );
   }
-  protected function get_body(){
+  protected function get_body(IRequest $request){
     return Convert::to_html($this->getMessage());
   }
-  public function get_response(IResponseFactory $response_factory){
-    return $response_factory->from_http_headers_and_body($this->get_headers(),$this->get_body(),$this->getCode(),$this->getMessage());
+  public function get_response(IResponseFactory $response_factory,IRequest $request){
+    return $response_factory->from_http_headers_and_body($this->get_headers(),$this->get_body($request),$this->getCode(),$this->getMessage());
   }
 }
 ?>

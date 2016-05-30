@@ -19,6 +19,9 @@ class Framework extends MockableSingleton implements IFramework{
   public function get_server_info_factory(){
     return ServerInfoFactory::get_instance();
   }
+  public function get_mails(){
+    return Mails::get_instance();
+  }
   public function get_output(){
     return HTTPOutput::get_instance();
   }
